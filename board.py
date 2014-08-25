@@ -1,5 +1,4 @@
 import piece
-
 from itertools import product
 
 
@@ -9,45 +8,41 @@ class Chessboard(object):
 
         self.board = dict()
 
+        self.directions = ["up", "down", "left", "right", "upright", "upleft", "downright", "downleft"]
+
         columns = map(chr, range(97, 105))
 
         for row, column in product(range(1, 9), columns):
             self.board[(row, column)] = None
 
-        # initialise the board with pieces
         for column in columns:
-            self.board[(2, column)] = piece.Pawn(color="white", position=[2, column], board=self)
+            self.board[(2, column)] = piece.Pawn(color="white", position=(2, column), board=self)
 
         for column in columns:
-            self.board[(7, column)] = piece.Pawn(color="black", position=[7, column], board=self)
+            self.board[(7, column)] = piece.Pawn(color="black", position=(7, column), board=self)
 
-        self.board[(1, 'a')] = piece.Rook(color="white", position=[1, 'a'], board=self)
-        self.board[(1, 'h')] = piece.Rook(color="white", position=[1, 'h'], board=self)
-        self.board[(8, 'a')] = piece.Rook(color="black", position=[8, 'a'], board=self)
-        self.board[(8, 'h')] = piece.Rook(color="black", position=[8, 'h'], board=self)
+        # TODO: loop this
+        self.board[(1, 'a')] = piece.Rook(color="white", position=(1, 'a'), board=self)
+        self.board[(1, 'h')] = piece.Rook(color="white", position=(1, 'h'), board=self)
+        self.board[(8, 'a')] = piece.Rook(color="black", position=(8, 'a'), board=self)
+        self.board[(8, 'h')] = piece.Rook(color="black", position=(8, 'h'), board=self)
 
-        self.board[(1, 'b')] = piece.Knight(color="white", position=[1, 'b'], board=self)
-        self.board[(1, 'g')] = piece.Knight(color="white", position=[1, 'g'], board=self)
-        self.board[(8, 'b')] = piece.Knight(color="black", position=[1, 'b'], board=self)
-        self.board[(8, 'g')] = piece.Knight(color="black", position=[1, 'g'], board=self)
+        self.board[(1, 'b')] = piece.Knight(color="white", position=(1, 'b'), board=self)
+        self.board[(1, 'g')] = piece.Knight(color="white", position=(1, 'g'), board=self)
+        self.board[(8, 'b')] = piece.Knight(color="black", position=(1, 'b'), board=self)
+        self.board[(8, 'g')] = piece.Knight(color="black", position=(1, 'g'), board=self)
 
-        self.board[(1, 'c')] = piece.Bishop(color="white", position=[1, 'c'], board=self)
-        self.board[(1, 'f')] = piece.Bishop(color="white", position=[1, 'f'], board=self)
-        self.board[(8, 'c')] = piece.Bishop(color="black", position=[8, 'c'], board=self)
-        self.board[(8, 'f')] = piece.Bishop(color="black", position=[8, 'f'], board=self)
+        self.board[(1, 'c')] = piece.Bishop(color="white", position=(1, 'c'), board=self)
+        self.board[(1, 'f')] = piece.Bishop(color="white", position=(1, 'f'), board=self)
+        self.board[(8, 'c')] = piece.Bishop(color="black", position=(8, 'c'), board=self)
+        self.board[(8, 'f')] = piece.Bishop(color="black", position=(8, 'f'), board=self)
 
-        self.board[(1, 'd')] = piece.Queen(color="white", position=[1, 'd'], board=self)
-        self.board[(8, 'd')] = piece.Queen(color="black", position=[8, 'd'], board=self)
+        self.board[(1, 'd')] = piece.Queen(color="white", position=(1, 'd'), board=self)
+        self.board[(8, 'd')] = piece.Queen(color="black", position=(8, 'd'), board=self)
 
-        self.board[(1, 'e')] = piece.King(color="white", position=[1, 'e'], board=self)
-        self.board[(8, 'e')] = piece.King(color="black", position=[8, 'e'], board=self)
+        self.board[(1, 'e')] = piece.King(color="white", position=(1, 'e'), board=self)
+        self.board[(8, 'e')] = piece.King(color="black", position=(8, 'e'), board=self)
 
-    def isInBoard(self, to):
-
-        if to in self.board.keys():
-            return True
-        else:
-            return False
 
     """
     checks whether a given path (between origin and target) is free.
@@ -133,7 +128,7 @@ class Chessboard(object):
     perspective. These are to be used mainly for pawns and the king.
     """
 
-    #TODO: find a more elegant solution
+    # TODO: find a more elegant solution
     def getAdjacent(self, square, direction):
 
         row, col = square[0], square[1]
@@ -166,15 +161,26 @@ class Chessboard(object):
             return False
 
 
+    def paths(self, piece, *directions):
 
+        possibleMoves = []
 
+        for direction in directions:
 
+            if direction not in self.directions:
+                continue
+            tile = self.getAdjacent(piece.position, direction)
 
+            while self.exists(tile):
 
+                if self.isEmpty(tile):
+                    possibleMoves.append(tile)
+                elif self.isEnemy(tile, piece.color):
+                    possibleMoves.append(tile)
+                    break
+                else:
+                    break
 
+                tile = self.getAdjacent(tile, direction)
 
-
-
-
-
-
+        return possibleMoves
