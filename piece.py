@@ -16,22 +16,22 @@ class Piece(pygame.sprite.Sprite):
         self.position = position
         self.color = color
         self.movesMade = 0
-        self.possibleMoves = []
+        self.possible_moves = []
         self.board = board
 
-        self.setPossibleMoves()
+        self.set_possible_moves()
 
         # set name of piece in compliance to FEN
-        pieceName = self.__class__.__name__
+        piece_name = self.__class__.__name__
         if self.color == "white":
-            self.name = pieceName[:1]
+            self.name = piece_name[:1]
         else:
-            self.name = pieceName.lower()[:1]
+            self.name = piece_name.lower()[:1]
 
-        self.loadImage()
-        self.setCoords()
+        self.load_image()
+        self.set_coords()
 
-    def setCoords(self):
+    def set_coords(self):
 
         """
         Map position of piece to coordinate on the screen
@@ -44,7 +44,6 @@ class Piece(pygame.sprite.Sprite):
 
         coords = (x, y)
         self.coords = coords
-        print self.name, self.coords
 
     @property
     def __str__(self):
@@ -52,191 +51,203 @@ class Piece(pygame.sprite.Sprite):
         return self.name
 
     def move(self, to):
+        """
+        Function to carry out the actual move. We assume the move has been checked already.
+        """
+        self.position = to
+        self.board.board[self.position] = None
+        self.board.board[to] = self
+        self.set_coords()
+
+    def set_possible_moves(self):
+
+        pass
+
+    def load_image(self):
 
         pass
 
 
 class Pawn(Piece):
-    def loadImage(self):
+    def load_image(self):
         if self.color == "black":
             self.image = pygame.image.load("images/bpawn.png")
             # self.image = pygame.transform.scale(self.image, (100,100))
         else:
             self.image = pygame.image.load("images/wpawn.png")
 
-    def setPossibleMoves(self):
+    def set_possible_moves(self):
 
         """
-:return:
         Pawns can advance two squares the first time they move and hit a piece that is adjacent to them.
         The biggest difference between pawns and the other pieces is that pawns can move in only one direction,
         therefore it is necessary to make a distinction based on the piece color
         """
 
         # TODO: Fix ugly checks and ifs
-        self.possibleMoves = []
+        self.possible_moves = []
 
         row, col = self.position[0], self.position[1]
         if self.color == "white":
 
-            forward = self.board.getAdjacent(self.position, "up")
-            upright = self.board.getAdjacent(self.position, "upright")
-            upleft = self.board.getAdjacent(self.position, "upleft")
+            forward = self.board.get_adjacent(self.position, "up")
+            upright = self.board.get_adjacent(self.position, "upright")
+            upleft = self.board.get_adjacent(self.position, "upleft")
 
-            if self.movesMade == 0 and self.board.vertPathFree(self.position, (row + 2, col)):
-                self.possibleMoves.extend([(row + 2, col), forward])
+            if self.movesMade == 0 and self.board.vert_path_free(self.position, (row + 2, col)):
+                self.possible_moves.extend([(row + 2, col), forward])
 
-            if self.board.exists(forward) and self.board.isEmpty(forward):
-                self.possibleMoves.append(forward)
+            if self.board.exists(forward) and self.board.is_empty(forward):
+                self.possible_moves.append(forward)
 
-            if self.board.exists(upright) and not self.board.isEmpty(upright):
-                if self.board.isEnemy(upright, self.color):
-                    self.possibleMoves.append(upright)
+            if self.board.exists(upright) and not self.board.is_empty(upright):
+                if self.board.is_enemy(upright, self.color):
+                    self.possible_moves.append(upright)
 
-            if self.board.exists(upleft) and not self.board.isEmpty(upleft):
-                if self.board.isEnemy(upleft, self.color):
-                    self.possibleMoves.append(upleft)
+            if self.board.exists(upleft) and not self.board.is_empty(upleft):
+                if self.board.is_enemy(upleft, self.color):
+                    self.possible_moves.append(upleft)
 
         else:
 
-            forward = self.board.getAdjacent(self.position, "down")
-            downleft = self.board.getAdjacent(self.position, "downleft")
-            downright = self.board.getAdjacent(self.position, "downright")
+            forward = self.board.get_adjacent(self.position, "down")
+            downleft = self.board.get_adjacent(self.position, "downleft")
+            downright = self.board.get_adjacent(self.position, "downright")
 
-            if self.movesMade == 0 and self.board.vertPathFree(self.position, (row + 2, col)):
-                self.possibleMoves.extend([(row - 2, col), forward])
+            if self.movesMade == 0 and self.board.vert_path_free(self.position, (row + 2, col)):
+                self.possible_moves.extend([(row - 2, col), forward])
 
-            if self.board.exists(forward) and self.board.isEmpty(forward):
-                self.possibleMoves.append(forward)
+            if self.board.exists(forward) and self.board.is_empty(forward):
+                self.possible_moves.append(forward)
 
-            if self.board.exists(downright) and not self.board.isEmpty(downright):
-                if self.board.isEnemy(downright, self.color):
-                    self.possibleMoves.append(downright)
+            if self.board.exists(downright) and not self.board.is_empty(downright):
+                if self.board.is_enemy(downright, self.color):
+                    self.possible_moves.append(downright)
 
-            if self.board.exists(downleft) and not self.board.isEmpty(downleft):
-                if self.board.isEnemy(downleft, self.color):
-                    self.possibleMoves.append(downleft)
+            if self.board.exists(downleft) and not self.board.is_empty(downleft):
+                if self.board.is_enemy(downleft, self.color):
+                    self.possible_moves.append(downleft)
 
 
 class Rook(Piece):
-    def loadImage(self):
+    def load_image(self):
         if self.color == "black":
             self.image = pygame.image.load("images/brook.png")
         else:
             self.image = pygame.image.load("images/wrook.png")
 
-    def setPossibleMoves(self):
+    def set_possible_moves(self):
         """
         Rooks can advance in any vertical or horizontal direction, they can castle with the king as
         long as they havent made a single move yet.
         """
         # TODO: castling
-        self.possibleMoves = []
+        self.possible_moves = []
 
-        self.possibleMoves.extend(self.board.paths(self, "up", "down", "left", "right"))
+        self.possible_moves.extend(self.board.paths(self, "up", "down", "left", "right"))
 
 
 class Knight(Piece):
-    def loadImage(self):
+    def load_image(self):
         if self.color == "black":
             self.image = pygame.image.load("images/bknight.png")
         else:
             self.image = pygame.image.load("images/wknight.png")
 
-    def setPossibleMoves(self):
+    def set_possible_moves(self):
         """
         Knights move two squares horizontally or vertically and then move one square left or right.
         """
-        self.possibleMoves = []
+        self.possible_moves = []
         row, col = self.position[0], self.position[1]
 
         # TODO: find something less ugly
-        tiles = [(row + 2, col), (row - 2, col), \
+        tiles = [(row + 2, col), (row - 2, col),
                  (row, chr(ord(col) + 2)), (row, chr(ord(col) - 2))]
 
         for tile in tiles:
 
             if tile[1] == col:
-                left = self.board.getAdjacent(tile, "left")
-                right = self.board.getAdjacent(tile, "right")
+                left = self.board.get_adjacent(tile, "left")
+                right = self.board.get_adjacent(tile, "right")
 
                 if self.board.exists(left):
-                    if self.board.isEmpty(left) or self.board.isEnemy(left, self.color):
-                        self.possibleMoves.append(left)
+                    if self.board.is_empty(left) or self.board.is_enemy(left, self.color):
+                        self.possible_moves.append(left)
 
                 if self.board.exists(right):
-                    if self.board.isEmpty(right) or self.board.isEnemy(right, self.color):
-                        self.possibleMoves.append(right)
+                    if self.board.is_empty(right) or self.board.is_enemy(right, self.color):
+                        self.possible_moves.append(right)
 
             else:
-                up = self.board.getAdjacent(tile, "up")
-                down = self.board.getAdjacent(tile, "down")
+                up = self.board.get_adjacent(tile, "up")
+                down = self.board.get_adjacent(tile, "down")
 
                 if self.board.exists(up):
-                    if self.board.isEmpty(up) or self.board.isEnemy(up, self.color):
-                        self.possibleMoves.append(up)
+                    if self.board.is_empty(up) or self.board.is_enemy(up, self.color):
+                        self.possible_moves.append(up)
 
                 if self.board.exists(down):
-                    if self.board.isEmpty(down) or self.board.isEnemy(down, self.color):
-                        self.possibleMoves.append(down)
+                    if self.board.is_empty(down) or self.board.is_enemy(down, self.color):
+                        self.possible_moves.append(down)
 
 
 class Bishop(Piece):
-    def loadImage(self):
+    def load_image(self):
         if self.color == "black":
             self.image = pygame.image.load("images/bbishop.png")
         else:
             self.image = pygame.image.load("images/wbishop.png")
 
-    def setPossibleMoves(self):
+    def set_possible_moves(self):
         """
         Bishops can move only in queer directions
         """
-        self.possibleMoves = []
+        self.possible_moves = []
 
-        self.possibleMoves.extend(self.board.paths(self, "upright", "upleft", "downright", "downleft"))
+        self.possible_moves.extend(self.board.paths(self, "upright", "upleft", "downright", "downleft"))
 
 
 class King(Piece):
-    def loadImage(self):
+    def load_image(self):
         if self.color == "black":
             self.image = pygame.image.load("images/bking.png")
         else:
             self.image = pygame.image.load("images/wking.png")
 
-    def setPossibleMoves(self):
+    def set_possible_moves(self):
         """
         Kings can move to any square that is directly adjacent to them.
         Kings can also castle.
         """
-        self.possibleMoves = []
+        self.possible_moves = []
 
         for direction in self.board.directions:
-            tile = self.board.getAdjacent(self.position, direction)
+            tile = self.board.get_adjacent(self.position, direction)
 
             if self.board.exists(tile):
-                if self.board.isEmpty(tile):
-                    self.possibleMoves.append(tile)
+                if self.board.is_empty(tile):
+                    self.possible_moves.append(tile)
 
                 else:
-                    if self.board.isEnemy(tile, self.color):
-                        self.possibleMoves.append(tile)
+                    if self.board.is_enemy(tile, self.color):
+                        self.possible_moves.append(tile)
 
                         # TODO: implement castling
 
 
 class Queen(Piece):
-    def loadImage(self):
+    def load_image(self):
         if self.color == "black":
             self.image = pygame.image.load("images/bqueen.png")
         else:
             self.image = pygame.image.load("images/wqueen.png")
 
-    def setPossibleMoves(self):
+    def set_possible_moves(self):
         """
         Queens can move in all directions.
         """
-        self.possibleMoves = []
+        self.possible_moves = []
 
-        self.possibleMoves.extend(self.board.paths(self, "up", "down", "left", "right", \
+        self.possible_moves.extend(self.board.paths(self, "up", "down", "left", "right",
                                                    "downright", "downleft", "upright", "upleft"))
