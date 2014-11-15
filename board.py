@@ -1,5 +1,6 @@
-import piece
 from itertools import product
+
+import piece
 
 
 class Chessboard(object):
@@ -29,8 +30,8 @@ class Chessboard(object):
 
         self.board[(1, 'b')] = piece.Knight(color="white", position=(1, 'b'), board=self)
         self.board[(1, 'g')] = piece.Knight(color="white", position=(1, 'g'), board=self)
-        self.board[(8, 'b')] = piece.Knight(color="black", position=(1, 'b'), board=self)
-        self.board[(8, 'g')] = piece.Knight(color="black", position=(1, 'g'), board=self)
+        self.board[(8, 'b')] = piece.Knight(color="black", position=(8, 'b'), board=self)
+        self.board[(8, 'g')] = piece.Knight(color="black", position=(8, 'g'), board=self)
 
         self.board[(1, 'c')] = piece.Bishop(color="white", position=(1, 'c'), board=self)
         self.board[(1, 'f')] = piece.Bishop(color="white", position=(1, 'f'), board=self)
