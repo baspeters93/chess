@@ -2,11 +2,16 @@
 Pieces are named using the Forsyth-Edwards Notation (FEN):
     - Pieces are named using their first letter (K for King, Q for Queen but N for kNight)
     - White pieces are given an uppercase notation
-"""
 
-# base class Piece containing most of the common functions
-class Piece(object):
+They are all subclasses of Pygame sprites, this allows for easier handling of the pieces in the GUI.
+"""
+import pygame
+
+
+class Piece(pygame.sprite.Sprite):
     def __init__(self, color, position, board):
+
+        pygame.sprite.Sprite.__init__(self)
 
         self.position = position
         self.color = color
@@ -23,6 +28,24 @@ class Piece(object):
         else:
             self.name = pieceName.lower()[:1]
 
+        self.loadImage()
+        self.setCoords()
+
+    def setCoords(self):
+
+        """
+        Map position of piece to coordinate on the screen
+        """
+
+        y = self.position[0]
+        x = (ord(self.position[1]) - 97)
+        x = (x / 8.0) * 800
+        y = (y / 8.0) * 800 - 100
+
+        coords = (x, y)
+        self.coords = coords
+        print self.name, self.coords
+
     @property
     def __str__(self):
 
@@ -34,9 +57,17 @@ class Piece(object):
 
 
 class Pawn(Piece):
+    def loadImage(self):
+        if self.color == "black":
+            self.image = pygame.image.load("images/bpawn.png")
+            # self.image = pygame.transform.scale(self.image, (100,100))
+        else:
+            self.image = pygame.image.load("images/wpawn.png")
+
     def setPossibleMoves(self):
 
         """
+:return:
         Pawns can advance two squares the first time they move and hit a piece that is adjacent to them.
         The biggest difference between pawns and the other pieces is that pawns can move in only one direction,
         therefore it is necessary to make a distinction based on the piece color
@@ -88,6 +119,12 @@ class Pawn(Piece):
 
 
 class Rook(Piece):
+    def loadImage(self):
+        if self.color == "black":
+            self.image = pygame.image.load("images/brook.png")
+        else:
+            self.image = pygame.image.load("images/wrook.png")
+
     def setPossibleMoves(self):
         """
         Rooks can advance in any vertical or horizontal direction, they can castle with the king as
@@ -100,6 +137,12 @@ class Rook(Piece):
 
 
 class Knight(Piece):
+    def loadImage(self):
+        if self.color == "black":
+            self.image = pygame.image.load("images/bknight.png")
+        else:
+            self.image = pygame.image.load("images/wknight.png")
+
     def setPossibleMoves(self):
         """
         Knights move two squares horizontally or vertically and then move one square left or right.
@@ -139,6 +182,12 @@ class Knight(Piece):
 
 
 class Bishop(Piece):
+    def loadImage(self):
+        if self.color == "black":
+            self.image = pygame.image.load("images/bbishop.png")
+        else:
+            self.image = pygame.image.load("images/wbishop.png")
+
     def setPossibleMoves(self):
         """
         Bishops can move only in queer directions
@@ -149,6 +198,12 @@ class Bishop(Piece):
 
 
 class King(Piece):
+    def loadImage(self):
+        if self.color == "black":
+            self.image = pygame.image.load("images/bking.png")
+        else:
+            self.image = pygame.image.load("images/wking.png")
+
     def setPossibleMoves(self):
         """
         Kings can move to any square that is directly adjacent to them.
@@ -167,10 +222,16 @@ class King(Piece):
                     if self.board.isEnemy(tile, self.color):
                         self.possibleMoves.append(tile)
 
-    # TODO: implement castling
+                        # TODO: implement castling
 
 
 class Queen(Piece):
+    def loadImage(self):
+        if self.color == "black":
+            self.image = pygame.image.load("images/bqueen.png")
+        else:
+            self.image = pygame.image.load("images/wqueen.png")
+
     def setPossibleMoves(self):
         """
         Queens can move in all directions.
