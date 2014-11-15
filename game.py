@@ -1,8 +1,8 @@
 import pygame
+import pygame.display as ui
 
 from board import Chessboard
 from player import Player
-import pygame.display as ui
 
 
 class Game(object):
@@ -15,11 +15,13 @@ class Game(object):
 
         self.players = (self.player1, self.player2)
 
+        self.selected_piece = None
+
         self.turn = "p1"
 
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
 
         """
         Initialize the GUI.
@@ -34,15 +36,24 @@ class Game(object):
         """
         Check whether the UI has been initialized. If this is not the case, we break.
         """
-        if ui.get_surface == None:
+        if ui.get_surface is None:
             raise
 
+        self.draw_board()
+
+    def draw_board(self):
+
+        """
+        Main function that will draw the pieces on the board according to the contents of our chessboard object.
+        """
         """
         Draw the chess tiles on the board
         """
         red = (255, 0, 0)
         white = (150, 150, 150)
         black = (50, 50, 50)
+        height = 800
+        width = 800
 
         self.screen.fill(red)
 
@@ -64,14 +75,6 @@ class Game(object):
 
         ui.update()
 
-        self.drawBoard()
-
-    def drawBoard(self):
-
-        """
-        Main function that will draw the pieces on the board according to the contents of our chessboard object.
-        """
-
         for square in self.board.board:
             if self.board.board[square] is None:
                 pass
@@ -82,12 +85,25 @@ class Game(object):
 
         ui.update()
 
-    def passTurn(self):
+    def passturn(self):
 
         if self.turn == "p1":
             self.turn = "p2"
         else:
             self.turn = "p1"
+
+    def show_possible_squares(self, piece):
+
+        red = (200, 0, 0)
+        green = (0, 200, 0)
+
+        for move in piece.possible_moves:
+            coords = self.board.map_square(move)
+            if self.board.is_empty(move):
+                pygame.draw.rect(self.screen, green, coords, 5)
+            else:
+                pygame.draw.rect(self.screen, red, coords, 5)
+            ui.update()
 
 
 def main():
@@ -109,6 +125,26 @@ def main():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+
+        """
+        If the our screen is clicked, we want to know what sprite (piece) was clicked.
+        If it's the right players's piece, we show the possible squares and then handle the selected move accordingly.
+        """
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pos = pygame.mouse.get_pos()
+            square = game.board.locate_square(pos)
+            piece = game.board.board[square]
+
+            if game.selected_piece is None:
+                if piece is not None:
+                    game.selected_piece = piece
+                    game.show_possible_squares(piece)
+            else:
+                if square in game.selected_piece.possible_moves:
+                    game.selected_piece.move(square)
+                    game.draw_board()
+                else:
+                    pass
 
 
 if __name__ == "__main__":

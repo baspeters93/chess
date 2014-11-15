@@ -5,8 +5,6 @@ import piece
 
 class Chessboard(object):
     def __init__(self):
-
-
         self.board = dict()
 
         self.directions = ["up", "down", "left", "right", "upright", "upleft", "downright", "downleft"]
@@ -51,16 +49,16 @@ class Chessboard(object):
     """
 
     # TODO: implement error classes
-    def vertPathFree(self, origin, target):
+    def vert_path_free(self, origin, target):
 
-        fromRow, fromCol = origin[0], origin[1]
-        targetRow, targetCol = target[0], target[1]
+        from_row, from_col = origin[0], origin[1]
+        target_row, targetCol = target[0], target[1]
 
-        if targetCol is not fromCol:
+        if targetCol is not from_col:
             raise
 
-        for row in range(fromRow, targetRow):
-            if self.board[row, fromCol] is not None:
+        for row in range(from_row, target_row):
+            if self.board[row, from_col] is not None:
                 return False
 
         return True
@@ -70,17 +68,17 @@ class Chessboard(object):
     :returns boolean
     """
 
-    def horizPathFree(self, origin, target):
+    def horiz_path_free(self, origin, target):
 
-        fromRow, fromCol = origin[0], origin[1]
-        targetRow, targetCol = target[0], target[1]
+        from_row, from_col = origin[0], origin[1]
+        target_row, target_col = target[0], target[1]
 
-        if targetRow is not fromRow:
+        if target_row is not from_row:
             raise
 
-        for col in xrange(ord(fromCol), ord(targetCol)):
+        for col in xrange(ord(from_col), ord(target_col)):
             col = chr(col)
-            if self.board[fromRow, col] is not None:
+            if self.board[from_row, col] is not None:
                 return False
 
         return True
@@ -89,7 +87,8 @@ class Chessboard(object):
     checks whether a given tile (tuple) is valid and returns a bool
     """
 
-    def exists(self, tile):
+    @staticmethod
+    def exists(tile):
 
         row, col = tile[0], tile[1]
 
@@ -104,9 +103,9 @@ class Chessboard(object):
     checks whether a given tile is empty (duh)
     """
 
-    def isEmpty(self, tile):
+    def is_empty(self, tile):
 
-        if self.board[tile] == None:
+        if self.board[tile] is None:
             return True
 
         else:
@@ -116,9 +115,9 @@ class Chessboard(object):
     checks whether the piece on a tile is of enemy color (not own color)
     """
 
-    def isEnemy(self, tile, ownColor):
+    def is_enemy(self, tile, own_color):
 
-        if self.board[tile].color is not ownColor:
+        if self.board[tile].color is not own_color:
             return True
         else:
             return False
@@ -130,7 +129,8 @@ class Chessboard(object):
     """
 
     # TODO: find a more elegant solution
-    def getAdjacent(self, square, direction):
+    @staticmethod
+    def get_adjacent(square, direction):
 
         row, col = square[0], square[1]
 
@@ -163,25 +163,55 @@ class Chessboard(object):
 
 
     def paths(self, piece, *directions):
-
-        possibleMoves = []
+        possible_moves = []
 
         for direction in directions:
 
             if direction not in self.directions:
                 continue
-            tile = self.getAdjacent(piece.position, direction)
+            tile = self.get_adjacent(piece.position, direction)
 
             while self.exists(tile):
 
-                if self.isEmpty(tile):
-                    possibleMoves.append(tile)
-                elif self.isEnemy(tile, piece.color):
-                    possibleMoves.append(tile)
+                if self.is_empty(tile):
+                    possible_moves.append(tile)
+                elif self.is_enemy(tile, piece.color):
+                    possible_moves.append(tile)
                     break
                 else:
                     break
 
-                tile = self.getAdjacent(tile, direction)
+                tile = self.get_adjacent(tile, direction)
 
-        return possibleMoves
+        return possible_moves
+
+    def locate_square(self, pos):
+        """
+        This function finds returns the piece on a given coordinate and None if there is none
+        """
+        for square in self.board:
+
+            minx = (ord(square[1]) - 97)
+            minx = int((minx / 8.0) * 800)
+            maxx = minx + 100
+
+            miny = int((square[0] / 8.0) * 800 - 100)
+            maxy = miny + 100
+
+            x = pos[0]
+            y = pos[1]
+
+            if x in range(minx, maxx) and y in range(miny, maxy):
+                return square
+
+    @staticmethod
+    def map_square(pos):
+        """
+        Gets a position on the board and returns the coords of the square on the board
+        """
+        minx = (ord(pos[1]) - 97)
+        minx = int((minx / 8.0) * 800)
+
+        miny = int((pos[0] / 8.0) * 800 - 100)
+
+        return (minx, miny, 100, 100)
