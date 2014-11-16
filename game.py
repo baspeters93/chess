@@ -142,6 +142,7 @@ def main():
             else:
                 if square in game.selected_piece.possible_moves:
                     game.selected_piece.move(square)
+                    game.selected_piece = None
                     game.draw_board()
                 else:
                     pass
